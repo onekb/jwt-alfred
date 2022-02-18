@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>onekb.jwt</string>
+	<key>connections</key>
+	<dict/>
+	<key>createdby</key>
+	<string>1kb</string>
+	<key>description</key>
+	<string>jwt view</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>jwt view</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>100</integer>
+				<key>keyword</key>
+				<string>jwt</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>eyJhb...</string>
+				<key>script</key>
+				<string>$input = "{query}";
+$input = urldecode($input);
+if(strtolower(substr($input,0,7)) == 'bearer '){
+	$input = substr($input,7);
+}
+
+$inputArr = explode('.', $input, 3);
+
+$header = json_decode(base64_decode($inputArr[0], true), true);
+$payload = json_decode(base64_decode($inputArr[1], true), true);
+
+$items = [];
+
+$items[] = [
+    "title" =&gt; strtoupper(join(' ', $header)),
+    "subtitle" =&gt; "Header",
+    "arg" =&gt; "",
+];
+
+function getDifference($queryStamp, $nowStamp)
+{
+    $cle = $queryStamp - $nowStamp;
+    if ($cle &gt; 0) {
+        $d = floor($cle / 3600 / 24);
+        $h = floor(($cle % (3600 * 24)) / 3600);
+        $m = floor(($cle % (3600 * 24)) % 3600 / 60);
+        $s = floor(($cle % (3600 * 24)) % 60);
+    } elseif ($cle &lt; 0) {
+        $d = ceil($cle / 3600 / 24);
+        $h = ceil(($cle % (3600 * 24)) / 3600);
+        $m = ceil(($cle % (3600 * 24)) % 3600 / 60);
+        $s = ceil(($cle % (3600 * 24)) % 60);
+    } else {
+        $d = 0;
+        $h = 0;
+        $m = 0;
+        $s = 0;
+    }
+    return "当前时间差 $d 天 $h 小时 $m 分 $s 秒";
+}
+
+foreach ($payload as $key =&gt; $value) {
+    $subtitle = 'Payload';
+    $enum = [
+        'iss' =&gt; 'Issuer(签发人)',
+        'sub' =&gt; 'Subject(主题)',
+        'aud' =&gt; 'Audience(受众)',
+        'exp' =&gt; 'Expiration(过期时间)',
+        'nbf' =&gt; 'Not Before(生效时间)',
+        'iat' =&gt; 'Issued At(签发时间)',
+        'jti' =&gt; 'JWT ID(编号)',
+    ];
+    $subtitle = $enum[$key] ?? $subtitle;
+    switch ($key) {
+        case 'exp':
+        case 'nbf':
+        case 'iat':
+            $subtitle .= ' ' . getDifference($value, time());
+    }
+    $items[] = [
+        "title" =&gt; "{$key}: {$value}",
+        "subtitle" =&gt; $subtitle,
+        "arg" =&gt; "",
+    ];
+}
+
+
+$return = [
+    'items' =&gt; $items
+];
+echo json_encode($return);</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>input jwt</string>
+				<key>title</key>
+				<string>JSON Web Tokens</string>
+				<key>type</key>
+				<integer>1</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>30F7BAC0-E9BB-45BE-A206-100B369290B3</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>jwt view</string>
+	<key>uidata</key>
+	<dict>
+		<key>30F7BAC0-E9BB-45BE-A206-100B369290B3</key>
+		<dict>
+			<key>xpos</key>
+			<integer>310</integer>
+			<key>ypos</key>
+			<integer>170</integer>
+		</dict>
+	</dict>
+	<key>variablesdontexport</key>
+	<array/>
+	<key>version</key>
+	<string>1.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/onekb</string>
+</dict>
+</plist>
